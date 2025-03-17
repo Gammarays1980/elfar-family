@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center">File Sharing</h1>
+
+        <!-- File Upload Form -->
+        <form method="POST" enctype="multipart/form-data" class="mb-4">
+            <div class="mb-3">
+                <label for="photo" class="form-label">Upload a Photo</label>
+                <input type="file" class="form-control" id="photo" name="photo" accept=".jpg, .jpeg, .png, .gif" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-upload"></i> Upload</button>
+        </form>
+
+        <!-- Display Uploaded Photos -->
+        <h2 class="text-center">Uploaded Photos</h2>
+        {% if photos_with_uploader %}
+            <div id="familyCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                <!-- Carousel Indicators -->
+                <div class="carousel-indicators">
+                    {% for photo in photos_with_uploader %}
+                        <button type="button" data-bs-target="#familyCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ loop.index }}"></button>
+                    {% endfor %}
+                </div>
+
+                <!-- Carousel Items -->
+                <div class="carousel-inner">
+                    {% for photo in photos_with_uploader %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <a href="{{ url_for('static', filename='uploads/' + photo.filename) }}" data-lightbox="family-photos">
+                                <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}" class="d-block w-100" alt="{{ photo.filename }}">
+                            </a>
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>Uploaded by: {{ photo.uploader }}</h5>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Carousel Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#familyCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#familyCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        {% else %}
+            <div class="alert alert-info mt-4">No photos uploaded yet. Upload some photos to see them here!</div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - Elfar's Family APP</title>
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS for Background and Font Color -->
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='family.jpg') }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: white; /* Set font color to white */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent navbar */
+        }
+        .navbar a {
+            color: white !important; /* Ensure navbar links are white */
+        }
+        .navbar a:hover {
+            color: #ddd !important; /* Lighten navbar links on hover */
+        }
+        .carousel-item img {
+            height: 200px; /* Set fixed height for carousel images */
+            width: 100%; /* Ensure images take full width */
+            object-fit: contain; /* Show entire photo while keeping aspect ratio */
+        }
+        .carousel-caption {
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for captions */
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .content {
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for content */
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px; /* Limit content width for better readability */
+        }
+        .btn-outline-light {
+            color: white; /* Ensure buttons are white */
+            border-color: white;
+        }
+        .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.1); /* Light background on hover */
+        }
+        .section-title {
+            background-color: rgba(0, 0, 0, 0.7); /* Darker transparent box for titles */
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block; /* Ensure the box wraps around the text */
+            margin-bottom: 10px; /* Add spacing below the title */
+        }
+        .recent-activity ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .recent-activity ul li {
+            padding: 5px 0;
+            white-space: nowrap; /* Ensure single line for each activity */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+        }
+
+        /* New Styles for Dates, Time, and Weather in One Line */
+        .info-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* Space between elements */
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            padding: 10px;
+            font-size: 14px; /* Smaller font size */
+            position: sticky;
+            top: 0;
+            z-index: 1000; /* Ensure it stays above other content */
+        }
+
+        /* Shift Content Up */
+        .content {
+            margin-top: 10px; /* Reduced margin to shift content up */
+        }
+
+        /* Dynamic Arrow Down */
+        .scroll-down-arrow {
+            text-align: center;
+            margin-top: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .scroll-down-arrow i {
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Elfar's Family APP</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('files') }}">Files</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('tasks') }}">Tasks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('chat') }}">Chat</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Info Bar (Dates, Time, and Weather in One Line) -->
+    <div class="info-bar">
+        <p id="hijri-date"></p> <!-- Weekday and Islamic Date in Arabic -->
+        <p id="gregorian-date"></p> <!-- Weekday and Date in English -->
+        <p id="time"></p> <!-- Time -->
+        <p id="weather">Weather: Loading...</p> <!-- Weather widget -->
+    </div>
+
+    <!-- Dynamic Arrow Down -->
+    <div class="scroll-down-arrow">
+        <i class="fas fa-chevron-down"></i> <!-- Font Awesome arrow icon -->
+    </div>
+
+    <!-- Main Content -->
+    <div class="content text-center">
+        <h1 class="display-4">Welcome to Elfar's Family</h1>
+        <p class="lead">We share our moments together, we are a family.</p>
+
+        <!-- Carousel -->
+        {% if current_user.is_authenticated and photos_with_uploader %}
+            <div id="familyCarousel" class="carousel slide mt-4" data-bs-ride="carousel" data-bs-interval="3000">
+                <!-- Carousel Indicators -->
+                <div class="carousel-indicators">
+                    {% for photo in photos_with_uploader %}
+                        <button type="button" data-bs-target="#familyCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ loop.index }}"></button>
+                    {% endfor %}
+                </div>
+
+                <!-- Carousel Items -->
+                <div class="carousel-inner">
+                    {% for photo in photos_with_uploader %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}" class="d-block w-100" alt="{{ photo.filename }}">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>Uploaded by: {{ photo.uploader }}</h5>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Carousel Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#familyCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#familyCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        {% elif current_user.is_authenticated and not photos_with_uploader %}
+            <div class="alert alert-info mt-4">No photos uploaded yet. <a href="{{ url_for('files') }}">Upload some photos</a> to see them here!</div>
+        {% endif %}
+
+        <!-- Recent Activity -->
+        <div class="recent-activity mt-4">
+            <h3 class="section-title">Recent Activity</h3> <!-- Darker transparent box for title -->
+            <ul>
+                {% if recent_activity %}
+                    {% for activity in recent_activity[:2] %} <!-- Show only the two most recent activities -->
+                        <li>{{ activity }}</li>
+                    {% endfor %}
+                    {% if recent_activity|length > 2 %}
+                        <li>And {{ recent_activity|length - 2 }} more...</li>
+                    {% endif %}
+                {% else %}
+                    <li>No recent activity.</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links mt-4">
+            <h3 class="section-title">Quick Links</h3> <!-- Darker transparent box for title -->
+            <div class="d-flex justify-content-center">
+                <a href="{{ url_for('files') }}" class="btn btn-outline-light mx-2">Files</a>
+                <a href="{{ url_for('tasks') }}" class="btn btn-outline-light mx-2">Tasks</a>
+                <a href="{{ url_for('chat') }}" class="btn btn-outline-light mx-2">Chat</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <!-- Font Awesome for Arrow Icon -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <!-- JavaScript -->
+    <script>
+        // Display Weekday and Islamic Date in Arabic (with year)
+        function updateHijriDate() {
+            try {
+                const now = new Date();
+                const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }).format(now);
+                document.getElementById('hijri-date').textContent = hijriDate;
+            } catch (error) {
+                console.error('Error updating Hijri date:', error);
+                document.getElementById('hijri-date').textContent = 'Hijri Date: Unavailable';
+            }
+        }
+
+        // Display Weekday and Date in English
+        function updateGregorianDate() {
+            try {
+                const now = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('gregorian-date').textContent = now.toLocaleDateString('en-US', options);
+            } catch (error) {
+                console.error('Error updating Gregorian date:', error);
+                document.getElementById('gregorian-date').textContent = 'Gregorian Date: Unavailable';
+            }
+        }
+
+        // Display Time
+        function updateTime() {
+            try {
+                const now = new Date();
+                const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('time').textContent = `Time: ${time}`;
+            } catch (error) {
+                console.error('Error updating time:', error);
+                document.getElementById('time').textContent = 'Time: Unavailable';
+            }
+        }
+
+        // Function to fetch and display weather data
+        function updateWeather() {
+            const apiKey = 'bceb0c3258d803df1bbbab1e0879abc0'; // Replace with your API key
+            const city = 'Alexandria'; // Replace with your city
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.cod === 200) {
+                        const weatherDescription = data.weather[0].description;
+                        const temperature = data.main.temp;
+                        const weatherIcon = data.weather[0].icon;
+                        const weatherHtml = `
+                            <img src="http://openweathermap.org/img/wn/${weatherIcon}.png" alt="${weatherDescription}">
+                            ${weatherDescription}, ${temperature}°C
+                        `;
+                        document.getElementById('weather').innerHTML = weatherHtml;
+                    } else {
+                        console.error('Weather API error:', data.message);
+                        document.getElementById('weather').textContent = `Weather: ${data.message}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    document.getElementById('weather').textContent = 'Weather: Unavailable';
+                });
+        }
+
+        // Update dates and time every second
+        setInterval(() => {
+            updateHijriDate();
+            updateGregorianDate();
+            updateTime();
+        }, 1000);
+
+        // Update weather every 10 minutes (600,000 milliseconds)
+        setInterval(updateWeather, 600000);
+
+        // Initial call to display dates, time, and weather immediately
+        updateHijriDate();
+        updateGregorianDate();
+        updateTime();
+        updateWeather();
+
+        // Scroll Down Arrow Functionality
+        document.querySelector('.scroll-down-arrow').addEventListener('click', () => {
+            window.scrollBy({
+                top: window.innerHeight * 0.8, // Scroll down by 80% of the viewport height
+                behavior: 'smooth' // Smooth scroll
+            });
+        });
+    </script>
+</body>
+</html>

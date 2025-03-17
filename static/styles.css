@@ -1,0 +1,71 @@
+/* General Styles */
+body {
+    background-image: url("../family.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    color: white;
+}
+
+.hero-section {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* Carousel Styles */
+.carousel {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.carousel img {
+    max-height: 400px;
+    object-fit: contain;
+    width: 100%;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* Scroll Down Indicator */
+.scroll-down-indicator {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Recent Activity and Quick Links */
+.recent-activity, .quick-links {
+    margin-top: 20px;
+}
+
+.list-group-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline-light {
+    border-color: white;
+    color: white;
+}
+
+.btn-outline-light:hover {
+    background-color: white;
+    color: black;
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Family Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Family Chat</h1>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+    <hr>
+
+    <!-- Chat Messages -->
+    <div id="chat-messages">
+        <!-- Messages will appear here -->
+    </div>
+
+    <!-- Chat Input -->
+    <input type="text" id="message-input" placeholder="Type your message...">
+    <button id="send-button">Send</button>
+
+    <script>
+        const socket = io();
+
+        // Send message
+        $('#send-button').on('click', function () {
+            const message = $('#message-input').val();
+            if (message) {
+                socket.send(message);
+                $('#message-input').val('');
+            }
+        });
+
+        // Receive message
+        socket.on('message', function (data) {
+            $('#chat-messages').append(`<p><strong>${data.username}:</strong> ${data.message}</p>`);
+        });
+    </script>
+</body>
+</html>
